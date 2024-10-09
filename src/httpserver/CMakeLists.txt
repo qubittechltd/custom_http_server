@@ -114,7 +114,7 @@ target_link_libraries(HttpServer
 target_include_directories(HttpServer
     PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}
-    PRIVATE
+    PUBLIC
         ${CMAKE_CURRENT_BINARY_DIR}
         ${CMAKE_CURRENT_SOURCE_DIR}
 )
