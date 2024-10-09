@@ -67,7 +67,7 @@ add_library(HttpServer
     qhttpserverstream.cpp
 )
 
-target_sources(HttpServer PRIVATE
+target_sources(HttpServer PUBLIC
     qabstracthttpserver.h
     qabstracthttpserver_p.h
     qhttpserver.h
