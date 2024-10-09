@@ -49,6 +49,7 @@
 # qt_internal_add_docs(HttpServer
 #                      ../../doc/config/qthttpserver.qdocconf
 # )
+
 cmake_minimum_required(VERSION 3.16)
 project(HttpServer VERSION 1.0 LANGUAGES CXX)
 
@@ -115,6 +116,7 @@ target_include_directories(HttpServer
         ${CMAKE_CURRENT_SOURCE_DIR}
     PRIVATE
         ${CMAKE_CURRENT_BINARY_DIR}
+        ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
 # Install rules
