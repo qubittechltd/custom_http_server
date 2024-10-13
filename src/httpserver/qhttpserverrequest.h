@@ -59,7 +59,7 @@ public:
     Q_HTTPSERVER_EXPORT quint16 remotePort() const;
     Q_HTTPSERVER_EXPORT QHostAddress localAddress() const;
     Q_HTTPSERVER_EXPORT quint16 localPort() const;
-    Q_HTTPSERVER_EXPORT Session &session() const;
+    Q_HTTPSERVER_EXPORT const Session * session() const;
 
 private:
     Q_DISABLE_COPY(QHttpServerRequest)
@@ -80,4 +80,11 @@ Q_DECLARE_OPERATORS_FOR_FLAGS(QHttpServerRequest::Methods)
 
 QT_END_NAMESPACE
 
+template<typename Session>
+class SessionImpl{
+    Session & session() const {
+        static_assert(0," Please inhereint this");
+        return Session();
+    }
+};
 #endif // QHTTPSERVERREQUEST_H
