@@ -81,11 +81,15 @@ Q_DECLARE_OPERATORS_FOR_FLAGS(QHttpServerRequest::Methods)
 
 QT_END_NAMESPACE
 
-template<typename Session>
-class SessionImpl{
-    Session & session() const {
-        static_assert(0," Please inhereint this");
-        return Session();
-    }
-};
+namespace QUBIT {
+    template<typename Session>
+    class SessionImpl{
+        Session & session() const {
+            static_assert(0," Please inhereint this");
+            return Session();
+        }
+    };
+}
+
+
 #endif // QHTTPSERVERREQUEST_H
