@@ -17,8 +17,9 @@ QT_BEGIN_NAMESPACE
 
 class QRegularExpression;
 class QString;
-
-class Session;
+namespace QUBIT {
+    class Session;
+}
 class QHttpServerRequestPrivate;
 class QHttpServerRequest final
 {
@@ -59,7 +60,7 @@ public:
     Q_HTTPSERVER_EXPORT quint16 remotePort() const;
     Q_HTTPSERVER_EXPORT QHostAddress localAddress() const;
     Q_HTTPSERVER_EXPORT quint16 localPort() const;
-    Q_HTTPSERVER_EXPORT const Session * session() const;
+    Q_HTTPSERVER_EXPORT const QUBIT::Session * session() const;
 
 private:
     Q_DISABLE_COPY(QHttpServerRequest)
