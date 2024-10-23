@@ -19,7 +19,10 @@ class QHttpServerRequest;
 class QHttpServerResponder;
 class QRegularExpressionMatch;
 class QHttpServerRouter;
-class MIDDLEWARE_P;
+
+namespace QUBIT {
+    class MIDDLEWARE_P;
+}
 
 class QHttpServerRouterRulePrivate;
 class Q_HTTPSERVER_EXPORT QHttpServerRouterRule
@@ -54,7 +57,7 @@ private:
     std::unique_ptr<QHttpServerRouterRulePrivate> d_ptr;
 
     friend class QHttpServerRouter;
-    friend class MIDDLEWARE_P;
+    friend class QUBIT::MIDDLEWARE_P;
 };
 
 QT_END_NAMESPACE
