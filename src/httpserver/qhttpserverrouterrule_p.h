@@ -27,7 +27,7 @@ public:
     QString pathPattern;
     QHttpServerRequest::Methods methods;
     QHttpServerRouterRule::RouterHandler routerHandler;
-
+    qint64 middleware_flag = 0;
     QRegularExpression pathRegexp;
 };
 

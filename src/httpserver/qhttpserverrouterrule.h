@@ -40,6 +40,8 @@ public:
                                    RouterHandler routerHandler);
     virtual ~QHttpServerRouterRule();
 
+    void setMiddleWare(qint64 flag);
+
 protected:
     bool exec(const QHttpServerRequest &request, QHttpServerResponder &responder) const;
 

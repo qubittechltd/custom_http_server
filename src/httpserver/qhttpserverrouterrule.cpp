@@ -126,6 +126,12 @@ QHttpServerRouterRule::~QHttpServerRouterRule()
 {
 }
 
+void QHttpServerRouterRule::setMiddleWare(qint64 flag)
+{
+   Q_D( QHttpServerRouterRule);
+   d->middleware_flag =flag;
+}
+
 /*!
     Returns \c true if the methods is valid
 */
