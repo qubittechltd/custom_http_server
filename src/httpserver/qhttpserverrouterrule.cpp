@@ -107,7 +107,7 @@ QHttpServerRouterRule::QHttpServerRouterRule(const QString &pathPattern,
     : QHttpServerRouterRule(
         new QHttpServerRouterRulePrivate{pathPattern,
                                          methods,
-                                         std::move(routerHandler), {}})
+                                         std::move(routerHandler),0,{}})
 {
 }
 
