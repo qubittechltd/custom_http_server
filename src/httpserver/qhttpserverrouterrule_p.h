@@ -8,6 +8,7 @@
 
 #include <QtCore/qregularexpression.h>
 #include <QtCore/qstring.h>
+#include <QtCore/qpointer.h>
 
 //
 //  W A R N I N G
@@ -30,7 +31,9 @@ class QHttpServerRouterRulePrivate
 public:
     QString pathPattern;
     QHttpServerRequest::Methods methods;
-    QHttpServerRouterRule::RouterHandler routerHandler;
+    QtPrivate::SlotObjUniquePtr routerHandler;
+    QPointer<const QObject> context;
+
     QRegularExpression pathRegexp;
     std::vector<const QUBIT::MiddleWareIMpl * > middlewares;
 };

@@ -10,6 +10,9 @@
 #include <QtCore/qurl.h>
 #include <QtCore/qurlquery.h>
 #include <QtNetwork/qhostaddress.h>
+#if QT_CONFIG(ssl)
+#include <QtNetwork/qsslconfiguration.h>
+#endif
 
 #include <memory>
 
@@ -20,11 +23,15 @@ class QString;
 namespace QUBIT {
     class Session;
 }
+class QHttpHeaders;
+
 class QHttpServerRequestPrivate;
 class QHttpServerRequest final
 {
     friend class QHttpServerResponse;
     friend class QHttpServerStream;
+    friend class QHttpServerHttp1ProtocolHandler;
+    friend class QHttpServerHttp2ProtocolHandler;
 
     Q_GADGET_EXPORT(Q_HTTPSERVER_EXPORT)
 
@@ -54,13 +61,17 @@ public:
     Q_HTTPSERVER_EXPORT QUrl url() const;
     Q_HTTPSERVER_EXPORT QUrlQuery query() const;
     Q_HTTPSERVER_EXPORT Method method() const;
-    Q_HTTPSERVER_EXPORT QList<QPair<QByteArray, QByteArray>> headers() const;
+    Q_HTTPSERVER_EXPORT const QHttpHeaders &headers() const &;
+    Q_HTTPSERVER_EXPORT QHttpHeaders headers() &&;
     Q_HTTPSERVER_EXPORT QByteArray body() const;
     Q_HTTPSERVER_EXPORT QHostAddress remoteAddress() const;
     Q_HTTPSERVER_EXPORT quint16 remotePort() const;
     Q_HTTPSERVER_EXPORT QHostAddress localAddress() const;
     Q_HTTPSERVER_EXPORT quint16 localPort() const;
     Q_HTTPSERVER_EXPORT const QUBIT::Session * session() const;
+#if QT_CONFIG(ssl)
+    Q_HTTPSERVER_EXPORT QSslConfiguration sslConfiguration() const;
+#endif
 
 private:
     Q_DISABLE_COPY(QHttpServerRequest)
@@ -73,6 +84,13 @@ private:
                                                     quint16 remotePort,
                                                     const QHostAddress &localAddress,
                                                     quint16 localPort);
+#if QT_CONFIG(ssl)
+    Q_HTTPSERVER_EXPORT explicit QHttpServerRequest(const QHostAddress &remoteAddress,
+                                                    quint16 remotePort,
+                                                    const QHostAddress &localAddress,
+                                                    quint16 localPort,
+                                                    const QSslConfiguration &sslConfiguration);
+#endif
 
     std::unique_ptr<QHttpServerRequestPrivate> d;
 };
