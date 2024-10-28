@@ -204,6 +204,12 @@ QHttpServerRouterRule::~QHttpServerRouterRule()
 }
 
 QHttpServerRouterRule *QHttpServerRouterRule::middleware(std::string name){
+/*!
+    Returns the context object of this rule. This is the receiver that has to
+    handle the request.
+*/
+const QObject *QHttpServerRouterRule::contextObject() const
+{
     Q_D(const QHttpServerRouterRule);
     auto type = QMetaType::fromName(name);
 
@@ -217,6 +223,7 @@ QHttpServerRouterRule *QHttpServerRouterRule::middleware(std::string name){
     }
     qWarning("Middleware (%s) is not valid ",name.c_str());
     return this;
+    return d->context;
 }
 
 
