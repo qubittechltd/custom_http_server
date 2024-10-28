@@ -4,12 +4,16 @@
 #include "qhttpserverrequest_p.h"
 
 #include <QtHttpServer/qhttpserverrequest.h>
+#include <QtNetwork/qhttpheaders.h>
 
 #include <QtCore/qdebug.h>
 #include <QtCore/qloggingcategory.h>
 #include <QtNetwork/qtcpsocket.h>
 #if QT_CONFIG(ssl)
 #include <QtNetwork/qsslsocket.h>
+#endif
+#if QT_CONFIG(http)
+#include <QtNetwork/private/qhttp2connection_p.h>
 #endif
 
 Q_LOGGING_CATEGORY(lc, "qt.httpserver.request")
@@ -32,17 +36,7 @@ Q_HTTPSERVER_EXPORT QDebug operator<<(QDebug debug, const QHttpServerRequest &re
     QDebugStateSaver saver(debug);
     debug.nospace() << "QHttpServerRequest(";
     debug << "(Url: " << request.url() << ")";
-    debug << "(Headers: ";
-    auto headers = request.headers();
-    bool firstHeader = true;
-    for (auto i = headers.begin(); i != headers.end(); ++i) {
-        if (firstHeader)
-            firstHeader = false;
-        else
-            debug << ", ";
-        debug << "(" << i->first << ": " << i->second << ")";
-    }
-    debug << ")";
+    debug << "(Headers: " << request.headers() << ")";
     debug << "(RemoteHost: " << request.remoteAddress() << ")";
     debug << "(BodySize: " << request.body().size() << ")";
     debug << ')';
@@ -50,6 +44,32 @@ Q_HTTPSERVER_EXPORT QDebug operator<<(QDebug debug, const QHttpServerRequest &re
 }
 
 #endif
+
+namespace {
+
+QHttpServerRequest::Method parseRequestMethod(QByteArrayView str)
+{
+    if (str == "GET")
+        return QHttpServerRequest::Method::Get;
+    else if (str == "PUT")
+        return QHttpServerRequest::Method::Put;
+    else if (str == "DELETE")
+        return QHttpServerRequest::Method::Delete;
+    else if (str == "POST")
+        return QHttpServerRequest::Method::Post;
+    else if (str == "HEAD")
+        return QHttpServerRequest::Method::Head;
+    else if (str == "OPTIONS")
+        return QHttpServerRequest::Method::Options;
+    else if (str == "PATCH")
+        return QHttpServerRequest::Method::Patch;
+    else if (str == "CONNECT")
+        return QHttpServerRequest::Method::Connect;
+    else
+        return QHttpServerRequest::Method::Unknown;
+}
+
+} // anonymous namespace
 
 /*!
     \internal
@@ -88,25 +108,7 @@ bool QHttpServerRequestPrivate::parseRequestLine(QByteArrayView line)
     parser.setMajorVersion(protocol[5] - '0');
     parser.setMinorVersion(protocol[7] - '0');
 
-    if (requestMethod == "GET")
-        method = QHttpServerRequest::Method::Get;
-    else if (requestMethod == "PUT")
-        method = QHttpServerRequest::Method::Put;
-    else if (requestMethod == "DELETE")
-        method = QHttpServerRequest::Method::Delete;
-    else if (requestMethod == "POST")
-        method = QHttpServerRequest::Method::Post;
-    else if (requestMethod == "HEAD")
-        method = QHttpServerRequest::Method::Head;
-    else if (requestMethod == "OPTIONS")
-        method = QHttpServerRequest::Method::Options;
-    else if (requestMethod == "PATCH")
-        method = QHttpServerRequest::Method::Patch;
-    else if (requestMethod == "CONNECT")
-        method = QHttpServerRequest::Method::Connect;
-    else
-        method = QHttpServerRequest::Method::Unknown;
-
+    method = parseRequestMethod(requestMethod);
     url = QUrl::fromEncoded(requestUrl.toByteArray());
     return true;
 }
@@ -114,7 +116,7 @@ bool QHttpServerRequestPrivate::parseRequestLine(QByteArrayView line)
 /*!
     \internal
 */
-qsizetype QHttpServerRequestPrivate::readRequestLine(QAbstractSocket *socket)
+qsizetype QHttpServerRequestPrivate::readRequestLine(QIODevice *socket)
 {
     if (fragment.isEmpty()) {
         // reserve bytes for the request line. This is better than always append() which reallocs
@@ -176,7 +178,7 @@ qint64 QHttpServerRequestPrivate::contentLength() const
 /*!
     \internal
 */
-qsizetype QHttpServerRequestPrivate::readHeader(QAbstractSocket *socket)
+qsizetype QHttpServerRequestPrivate::readHeader(QIODevice *socket)
 {
     if (fragment.isEmpty()) {
         // according to
@@ -267,7 +269,7 @@ qsizetype QHttpServerRequestPrivate::readHeader(QAbstractSocket *socket)
 /*!
     \internal
 */
-qsizetype QHttpServerRequestPrivate::sendContinue(QAbstractSocket *socket)
+qsizetype QHttpServerRequestPrivate::sendContinue(QIODevice *socket)
 {
     qsizetype ret = socket->write("HTTP/1.1 100 Continue\r\n\r\n");
     state = State::ReadingData;
@@ -289,10 +291,29 @@ QHttpServerRequestPrivate::QHttpServerRequestPrivate(const QHostAddress &remoteA
     clear();
 }
 
+#if QT_CONFIG(ssl)
 /*!
     \internal
 */
-bool QHttpServerRequestPrivate::parse(QAbstractSocket *socket)
+QHttpServerRequestPrivate::QHttpServerRequestPrivate(const QHostAddress &remoteAddress,
+                                                     quint16 remotePort,
+                                                     const QHostAddress &localAddress,
+                                                     quint16 localPort,
+                                                     const QSslConfiguration &sslConfiguration)
+    : remoteAddress(remoteAddress),
+      remotePort(remotePort),
+      localAddress(localAddress),
+      localPort(localPort),
+      sslConfiguration(sslConfiguration)
+{
+    clear();
+}
+#endif
+
+/*!
+    \internal
+*/
+bool QHttpServerRequestPrivate::parse(QIODevice *socket)
 {
     qsizetype read;
 
@@ -332,6 +353,44 @@ bool QHttpServerRequestPrivate::parse(QAbstractSocket *socket)
     return read != -1;
 }
 
+#if QT_CONFIG(http)
+bool QHttpServerRequestPrivate::parse(QHttp2Stream *socket)
+{
+    parser.clear();
+
+    for (const auto &pair : socket->receivedHeaders()) {
+        if (pair.name == ":method") {
+            method = parseRequestMethod(pair.value);
+        } else if (pair.name == ":scheme") {
+            url.setScheme(QLatin1StringView(pair.value));
+        } else if (pair.name == ":authority") {
+            url.setAuthority(QLatin1StringView(pair.value));
+        } else if (pair.name == ":path") {
+            auto path = QUrl::fromEncoded(pair.value);
+            url.setPath(path.path());
+            url.setQuery(path.query());
+        } else {
+            parser.appendHeaderField(pair.name, pair.value);
+        }
+    }
+
+    if (url.scheme().isEmpty())
+        url.setScheme(u"https"_s);
+
+    if (url.host().isEmpty())
+        url.setHost(u"127.0.0.1"_s);
+
+    if (url.port() == -1)
+        url.setPort(port);
+
+    bodyLength = contentLength(); // cache the length
+
+    body = socket->downloadBuffer().readAll();
+
+    return true;
+}
+#endif
+
 /*!
     \internal
 */
@@ -358,7 +417,7 @@ void QHttpServerRequestPrivate::clear()
 */
 // note this function can only be used for non-chunked, non-compressed with
 // known content length
-qsizetype QHttpServerRequestPrivate::readBodyFast(QAbstractSocket *socket)
+qsizetype QHttpServerRequestPrivate::readBodyFast(QIODevice *socket)
 {
 
     qsizetype toBeRead = qMin(socket->bytesAvailable(), bodyLength - contentRead);
@@ -387,7 +446,7 @@ qsizetype QHttpServerRequestPrivate::readBodyFast(QAbstractSocket *socket)
 /*!
     \internal
 */
-qsizetype QHttpServerRequestPrivate::readRequestBodyRaw(QAbstractSocket *socket, qsizetype size)
+qsizetype QHttpServerRequestPrivate::readRequestBodyRaw(QIODevice *socket, qsizetype size)
 {
     // FIXME get rid of this function and just use readBodyFast and give it socket->bytesAvailable()
     qsizetype bytes = 0;
@@ -418,7 +477,7 @@ qsizetype QHttpServerRequestPrivate::readRequestBodyRaw(QAbstractSocket *socket,
 /*!
     \internal
 */
-qsizetype QHttpServerRequestPrivate::readRequestBodyChunked(QAbstractSocket *socket)
+qsizetype QHttpServerRequestPrivate::readRequestBodyChunked(QIODevice *socket)
 {
     qsizetype bytes = 0;
     while (socket->bytesAvailable()) {
@@ -480,7 +539,7 @@ qsizetype QHttpServerRequestPrivate::readRequestBodyChunked(QAbstractSocket *soc
 /*!
     \internal
 */
-qsizetype QHttpServerRequestPrivate::getChunkSize(QAbstractSocket *socket, qsizetype *chunkSize)
+qsizetype QHttpServerRequestPrivate::getChunkSize(QIODevice *socket, qsizetype *chunkSize)
 {
     qsizetype bytes = 0;
     char crlf[2];
@@ -565,6 +624,19 @@ QHttpServerRequest::QHttpServerRequest(const QHostAddress &remoteAddress, quint1
     : d(new QHttpServerRequestPrivate(remoteAddress, remotePort, localAddress, localPort))
 {}
 
+#if QT_CONFIG(ssl)
+/*!
+    \internal
+*/
+QHttpServerRequest::QHttpServerRequest(const QHostAddress &remoteAddress, quint16 remotePort,
+                                       const QHostAddress &localAddress, quint16 localPort,
+                                       const QSslConfiguration &sslConfiguration)
+    : d(new QHttpServerRequestPrivate(remoteAddress, remotePort,
+                                      localAddress, localPort,
+                                      sslConfiguration))
+{}
+#endif
+
 /*!
     Destroys a QHttpServerRequest
 */
@@ -604,11 +676,19 @@ QHttpServerRequest::Method QHttpServerRequest::method() const
 }
 
 /*!
+    \fn const QHttpHeaders &QHttpServerRequest::headers() const &
+    \fn QHttpHeaders QHttpServerRequest::headers() &&
+
     Returns all the request headers.
 */
-QList<QPair<QByteArray, QByteArray>> QHttpServerRequest::headers() const
+const QHttpHeaders &QHttpServerRequest::headers() const &
 {
     return d->parser.headers();
+}
+
+QHttpHeaders QHttpServerRequest::headers() &&
+{
+    return std::move(d->parser).headers();
 }
 
 /*!
@@ -656,6 +736,20 @@ quint16 QHttpServerRequest::localPort() const
 {
     return d->localPort;
 }
+
+#if QT_CONFIG(ssl)
+/*!
+    Returns the configuration of the established TLS connection.
+    The configurations will return true for isNull() if the connection
+    is not using TLS.
+
+    \since 6.7
+*/
+QSslConfiguration QHttpServerRequest::sslConfiguration() const
+{
+    return d->sslConfiguration;
+}
+#endif
 
 QT_END_NAMESPACE
 
