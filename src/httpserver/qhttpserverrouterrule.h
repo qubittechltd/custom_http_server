@@ -40,7 +40,12 @@ public:
                                    RouterHandler routerHandler);
     virtual ~QHttpServerRouterRule();
 
-    void setMiddleWare(qint64 flag);
+
+    QHttpServerRouterRule * middleware(std::string name);
+
+    template<typename M>
+    QHttpServerRouterRule * middleware();
+
 
 protected:
     bool exec(const QHttpServerRequest &request, QHttpServerResponder &responder) const;
@@ -60,6 +65,7 @@ private:
 
     friend class QHttpServerRouter;
     friend class QUBIT::MIDDLEWARE_P;
+
 };
 
 QT_END_NAMESPACE

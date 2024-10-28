@@ -22,6 +22,7 @@ qt_internal_add_module(HttpServer
         qhttpserverviewtraits.h
         qhttpserverviewtraits_impl.h
         qthttpserverglobal.h
+        extras/middleware_impl.h
     LIBRARIES
         Qt::CorePrivate
         Qt::NetworkPrivate

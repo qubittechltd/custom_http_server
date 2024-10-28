@@ -19,6 +19,10 @@
 //
 // We mean it.
 
+namespace QUBIT{
+struct MiddleWareIMpl;
+}
+
 QT_BEGIN_NAMESPACE
 
 class QHttpServerRouterRulePrivate
@@ -27,8 +31,8 @@ public:
     QString pathPattern;
     QHttpServerRequest::Methods methods;
     QHttpServerRouterRule::RouterHandler routerHandler;
-    qint64 middleware_flag;
     QRegularExpression pathRegexp;
+    std::vector<const QUBIT::MiddleWareIMpl * > middlewares;
 };
 
 QT_END_NAMESPACE

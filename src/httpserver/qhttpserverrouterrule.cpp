@@ -107,7 +107,7 @@ QHttpServerRouterRule::QHttpServerRouterRule(const QString &pathPattern,
     : QHttpServerRouterRule(
         new QHttpServerRouterRulePrivate{pathPattern,
                                          methods,
-                                         std::move(routerHandler),0,{}})
+                                         std::move(routerHandler),{},{}})
 {
 }
 
@@ -126,11 +126,23 @@ QHttpServerRouterRule::~QHttpServerRouterRule()
 {
 }
 
-void QHttpServerRouterRule::setMiddleWare(qint64 flag)
-{
-   Q_D( QHttpServerRouterRule);
-   d->middleware_flag =flag;
+QHttpServerRouterRule *QHttpServerRouterRule::middleware(std::string name){
+    Q_D(const QHttpServerRouterRule);
+    auto type = QMetaType::fromName(name);
+
+    if(type.isValid() /*&& registeredInKernel.contains(type.id())*/){
+        if(auto m = dynamic_cast<QUBIT::MiddleWareIMpl *>(type.create())){
+            d->middlewares.push_back(m);
+            return this;
+        }else{
+            qWarning("Middleware (%s) is not registered ",name.c_str());
+        }
+    }
+    qWarning("Middleware (%s) is not valid ",name.c_str());
+    return this;
 }
+
+
 
 /*!
     Returns \c true if the methods is valid
@@ -240,3 +252,15 @@ bool QHttpServerRouterRule::createPathRegexp(std::initializer_list<QMetaType> me
 }
 
 QT_END_NAMESPACE
+
+template<typename M>
+QHttpServerRouterRule *QHttpServerRouterRule::middleware(){
+    Q_D( QHttpServerRouterRule);
+    for(auto m : d->middlewares){
+        if(auto _m = dynamic_cast<M*>(m)){
+            return this;
+        }
+    }
+    d->middlewares.push_back(new M);
+    return this;
+}
