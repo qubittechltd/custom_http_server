@@ -57,6 +57,15 @@ namespace QUBIT {
             return this;
         }
 
+        using ControllerHandler = std::function<QHttpServerResponse(const QHttpServerRequest &, QUBIT::Session &)>;
+        using ControllerHandlerRegex = std::function<QHttpServerResponse(const QRegularExpressionMatch &,const QHttpServerRequest &, QUBIT::Session &)>;
+
+        MiddleWareIMpl * only(const std::variant<ControllerHandler,ControllerHandlerRegex> & handler){
+            Q_UNUSED(handler)
+            qWarning("TODO MiddleWareIMpl * only(std::variant<ControllerHandler,ControllerHandlerRegex> ) not implemented");
+            return this;
+        }
+
     };
 }
 
