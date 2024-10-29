@@ -206,12 +206,10 @@ QHttpServerRouterRule::~QHttpServerRouterRule()
 
 QHttpServerRouterRule *QHttpServerRouterRule::middleware(std::string name)
 {
-    Q_D(QHttpServerRouterRule);
     auto type = QMetaType::fromName(name);
-
     if(type.isValid() /*&& registeredInKernel.contains(type.id())*/){
         if(auto m = static_cast<QUBIT::MiddleWareIMpl *>(type.create())){
-            d->middlewares.push_back(m);
+            d_ptr->middlewares.push_back(m);
             return this;
         }else{
             qWarning("Middleware (%s) is not registered ",name.c_str());
