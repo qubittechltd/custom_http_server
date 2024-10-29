@@ -92,13 +92,13 @@ private:
     Q_HTTPSERVER_EXPORT explicit QHttpServerRequest(const QHostAddress &remoteAddress,
                                                     quint16 remotePort,
                                                     const QHostAddress &localAddress,
-                                                    quint16 localPort,const QHttpServer * s);
+                                                    quint16 localPort, QHttpServer *s);
 #if QT_CONFIG(ssl)
     Q_HTTPSERVER_EXPORT explicit QHttpServerRequest(const QHostAddress &remoteAddress,
                                                     quint16 remotePort,
                                                     const QHostAddress &localAddress,
                                                     quint16 localPort,
-                                                    const QSslConfiguration &sslConfiguration,const QHttpServer * s);
+                                                    const QSslConfiguration &sslConfiguration,QHttpServer * s);
 #endif
 
     std::unique_ptr<QHttpServerRequestPrivate> d;
