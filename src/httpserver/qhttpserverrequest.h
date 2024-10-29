@@ -20,10 +20,17 @@ QT_BEGIN_NAMESPACE
 
 class QRegularExpression;
 class QString;
+class QHttpHeaders;
 namespace QUBIT {
     class Session;
+    template<typename Session>
+    class SessionImpl{
+        Session & session() const {
+            static_assert(0," Please inhereint this");
+            return Session();
+        }
+    };
 }
-class QHttpHeaders;
 
 class QHttpServerRequestPrivate;
 class QHttpServerRequest final
@@ -98,16 +105,5 @@ private:
 Q_DECLARE_OPERATORS_FOR_FLAGS(QHttpServerRequest::Methods)
 
 QT_END_NAMESPACE
-
-namespace QUBIT {
-    template<typename Session>
-    class SessionImpl{
-        Session & session() const {
-            static_assert(0," Please inhereint this");
-            return Session();
-        }
-    };
-}
-
 
 #endif // QHTTPSERVERREQUEST_H
