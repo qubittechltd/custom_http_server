@@ -282,11 +282,11 @@ qsizetype QHttpServerRequestPrivate::sendContinue(QIODevice *socket)
 QHttpServerRequestPrivate::QHttpServerRequestPrivate(const QHostAddress &remoteAddress,
                                                      quint16 remotePort,
                                                      const QHostAddress &localAddress,
-                                                     quint16 localPort)
+                                                     quint16 localPort,QHttpServer * s)
     : remoteAddress(remoteAddress),
       remotePort(remotePort),
       localAddress(localAddress),
-      localPort(localPort)
+      localPort(localPort),server(s)
 {
     clear();
 }
@@ -299,12 +299,12 @@ QHttpServerRequestPrivate::QHttpServerRequestPrivate(const QHostAddress &remoteA
                                                      quint16 remotePort,
                                                      const QHostAddress &localAddress,
                                                      quint16 localPort,
-                                                     const QSslConfiguration &sslConfiguration)
+                                                     const QSslConfiguration &sslConfiguration,QHttpServer * s)
     : remoteAddress(remoteAddress),
       remotePort(remotePort),
       localAddress(localAddress),
       localPort(localPort),
-      sslConfiguration(sslConfiguration)
+      sslConfiguration(sslConfiguration),server(s)
 {
     clear();
 }
