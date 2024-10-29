@@ -87,7 +87,7 @@ public:
     QByteArray fragment;
     QByteDataBuffer bodyBuffer;
     QByteArray body;
-    const QHttpServer * server;
+    QHttpServer * server;
 };
 
 QT_END_NAMESPACE

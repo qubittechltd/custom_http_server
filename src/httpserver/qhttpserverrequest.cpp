@@ -737,6 +737,11 @@ quint16 QHttpServerRequest::localPort() const
     return d->localPort;
 }
 
+QHttpServer * QHttpServerRequest::server() const
+{
+    return d->server;
+}
+
 #if QT_CONFIG(ssl)
 /*!
     Returns the configuration of the established TLS connection.

@@ -77,6 +77,7 @@ public:
     Q_HTTPSERVER_EXPORT QHostAddress localAddress() const;
     Q_HTTPSERVER_EXPORT quint16 localPort() const;
     Q_HTTPSERVER_EXPORT const QUBIT::Session * session() const;
+    Q_HTTPSERVER_EXPORT QHttpServer *server() const;
 #if QT_CONFIG(ssl)
     Q_HTTPSERVER_EXPORT QSslConfiguration sslConfiguration() const;
 #endif
