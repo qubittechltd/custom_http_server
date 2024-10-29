@@ -17,4 +17,4 @@ find_package(Qt6 CONFIG REQUIRED COMPONENTS BuildInternals Core Network)
 find_package(Qt6 CONFIG OPTIONAL_COMPONENTS Concurrent WebSockets Gui)
 qt_internal_project_setup()
 
-qt_build_repo()
+# qt_build_repo()
