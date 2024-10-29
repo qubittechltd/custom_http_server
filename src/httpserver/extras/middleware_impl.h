@@ -1,77 +1,78 @@
-#ifndef MIDDLEWARE_IMPL_H
-#define MIDDLEWARE_IMPL_H
+// #ifndef MIDDLEWARE_IMPL_H
+// #define MIDDLEWARE_IMPL_H
 
-#include <QtHttpServer/QHttpServerRequest>
-#include <QtHttpServer/QHttpServerResponse>
+// #include <QtHttpServer/QHttpServerRequest>
+// #include <QtHttpServer/QHttpServerResponse>
+
+// QT_BEGIN_NAMESPACE
+
+// QT_END_NAMESPACE
 
 
-namespace QUBIT {
-    class Session;
-    struct MiddleWareIMpl
-    {
-        using  MiddleWares = std::vector<const MiddleWareIMpl *>;
-        using  RequestHandler  =std::function<QHttpServerResponse(const QHttpServerRequest &)>;
-        struct Next{
+// namespace QUBIT {
+//     class Session;
+//     struct MiddleWareIMpl
+//     {
+//         using  MiddleWares = std::vector<const MiddleWareIMpl *>;
+//         using  RequestHandler  =std::function<QHttpServerResponse(const QHttpServerRequest &)>;
+//         struct Next{
 
-            std::unique_ptr<QHttpServerResponse> operator()(const QHttpServerRequest &request) const {
+//             std::unique_ptr<QHttpServerResponse> operator()(const QHttpServerRequest &request) const {
 
-                if(_middlewares.cbegin() ==  _middlewares.cend()){
+//                 if(_middlewares.cbegin() ==  _middlewares.cend()){
 
-                    QHttpServerResponse* responsePtr = (QHttpServerResponse*)malloc(sizeof(QHttpServerResponse));
+//                     QHttpServerResponse* responsePtr = (QHttpServerResponse*)malloc(sizeof(QHttpServerResponse));
 
-                    // memcpy(responsePtr,_hander(request),malloc(sizeof(QHttpServerResponse))
-                    *responsePtr = _hander(request);
+//                     // memcpy(responsePtr,_hander(request),malloc(sizeof(QHttpServerResponse))
+//                     *responsePtr = _hander(request);
 
-                    auto response = std::unique_ptr<QHttpServerResponse>(responsePtr);
+//                     auto response = std::unique_ptr<QHttpServerResponse>(responsePtr);
 
-                    return response;
-                }
+//                     return response;
+//                 }
 
-                const MiddleWareIMpl * curr = *_middlewares.cbegin();
+//                 const MiddleWareIMpl * curr = *_middlewares.cbegin();
 
-                auto nextItr = std::next(_middlewares.cbegin());
+//                 auto nextItr = std::next(_middlewares.cbegin());
 
-                Next next(MiddleWares(nextItr,_middlewares.cend()),_hander);
+//                 Next next(MiddleWares(nextItr,_middlewares.cend()),_hander);
 
-                auto  response = curr->handle(request,next);
+//                 auto  response = curr->handle(request,next);
 
-                return response;
-            }
-        protected:
-            Next(const MiddleWares middlewares,const RequestHandler & hander):
-                _hander(hander),
-                _middlewares(middlewares)
-            {
+//                 return response;
+//             }
+//         protected:
+//             Next(const MiddleWares middlewares,const RequestHandler & hander):
+//                 _hander(hander),
+//                 _middlewares(middlewares)
+//             {
 
-            }
-        private:
-            RequestHandler _hander;
-            const MiddleWares _middlewares;
-        };
-    protected:
-        virtual std::unique_ptr<QHttpServerResponse> handle(const QHttpServerRequest &request, const Next &next) const {
-            return next(request);
-        };
-    public:
-        MiddleWareIMpl * only(const std::string & method_name){
-            qWarning("TODO MiddleWareIMpl * only(std::string method_name = %s) not implemented",method_name.c_str());
-            return this;
-        }
+//             }
+//         private:
+//             RequestHandler _hander;
+//             const MiddleWares _middlewares;
+//         };
+//     protected:
+//         virtual std::unique_ptr<QHttpServerResponse> handle(const QHttpServerRequest &request, const Next &next) const {
+//             return next(request);
+//         };
+//     public:
+//         MiddleWareIMpl * only(const std::string & method_name){
+//             qWarning("TODO MiddleWareIMpl * only(std::string method_name = %s) not implemented",method_name.c_str());
+//             return this;
+//         }
 
-        using ControllerHandler = std::function<QHttpServerResponse(const QHttpServerRequest &, Session &)>;
-        using ControllerHandlerRegex = std::function<QHttpServerResponse(const QRegularExpressionMatch &,const QHttpServerRequest &, Session &)>;
+//         using ControllerHandler = std::function<QHttpServerResponse(const QHttpServerRequest &, Session &)>;
+//         using ControllerHandlerRegex = std::function<QHttpServerResponse(const QRegularExpressionMatch &,const QHttpServerRequest &, Session &)>;
 
-        MiddleWareIMpl * only(const std::variant<ControllerHandler,ControllerHandlerRegex> & handler){
-            Q_UNUSED(handler)
-            qWarning("TODO MiddleWareIMpl * only(std::variant<ControllerHandler,ControllerHandlerRegex> ) not implemented");
-            return this;
-        }
+//         MiddleWareIMpl * only(const std::variant<ControllerHandler,ControllerHandlerRegex> & handler){
+//             Q_UNUSED(handler)
+//             qWarning("TODO MiddleWareIMpl * only(std::variant<ControllerHandler,ControllerHandlerRegex> ) not implemented");
+//             return this;
+//         }
 
-    };
-}
+//     };
+// }
 
-QT_BEGIN_NAMESPACE
 
-QT_END_NAMESPACE
-
-#endif // MIDDLEWARE_IMPL_H
+// #endif // MIDDLEWARE_IMPL_H
