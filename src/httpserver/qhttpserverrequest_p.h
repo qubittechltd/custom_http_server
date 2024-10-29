@@ -4,6 +4,7 @@
 #ifndef QHTTPSERVERREQUEST_P_H
 #define QHTTPSERVERREQUEST_P_H
 
+#include "QtHttpServer/qhttpserver.h"
 #include <QtHttpServer/qhttpserverrequest.h>
 #include <QtNetwork/private/qhttpheaderparser_p.h>
 #include <QtCore/private/qbytedata_p.h>
@@ -26,11 +27,11 @@ class QHttpServerRequestPrivate
 {
 public:
     QHttpServerRequestPrivate(const QHostAddress &remoteAddress, quint16 remotePort,
-                              const QHostAddress &localAddress, quint16 localPort);
+                              const QHostAddress &localAddress, quint16 localPort,std::shared_ptr<QHttpServer> s);
 #if QT_CONFIG(ssl)
     QHttpServerRequestPrivate(const QHostAddress &remoteAddress, quint16 remotePort,
                               const QHostAddress &localAddress, quint16 localPort,
-                              const QSslConfiguration &sslConfiguration);
+                              const QSslConfiguration &sslConfiguration,std::shared_ptr<QHttpServer> s);
 #endif
 
     quint16 port = 0;
@@ -86,6 +87,7 @@ public:
     QByteArray fragment;
     QByteDataBuffer bodyBuffer;
     QByteArray body;
+    std::shared_ptr<const QHttpServer> server;
 };
 
 QT_END_NAMESPACE

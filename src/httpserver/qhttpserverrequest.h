@@ -21,6 +21,7 @@ QT_BEGIN_NAMESPACE
 class QRegularExpression;
 class QString;
 class QHttpHeaders;
+class QHttpServer;
 namespace QUBIT {
     class Session;
     template<typename Session>
@@ -90,13 +91,13 @@ private:
     Q_HTTPSERVER_EXPORT explicit QHttpServerRequest(const QHostAddress &remoteAddress,
                                                     quint16 remotePort,
                                                     const QHostAddress &localAddress,
-                                                    quint16 localPort);
+                                                    quint16 localPort,std::shared_ptr<QHttpServer> s);
 #if QT_CONFIG(ssl)
     Q_HTTPSERVER_EXPORT explicit QHttpServerRequest(const QHostAddress &remoteAddress,
                                                     quint16 remotePort,
                                                     const QHostAddress &localAddress,
                                                     quint16 localPort,
-                                                    const QSslConfiguration &sslConfiguration);
+                                                    const QSslConfiguration &sslConfiguration,std::shared_ptr<QHttpServer> s);
 #endif
 
     std::unique_ptr<QHttpServerRequestPrivate> d;
