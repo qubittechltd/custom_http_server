@@ -620,8 +620,8 @@ qsizetype QHttpServerRequestPrivate::getChunkSize(QIODevice *socket, qsizetype *
     \internal
 */
 QHttpServerRequest::QHttpServerRequest(const QHostAddress &remoteAddress, quint16 remotePort,
-                                       const QHostAddress &localAddress, quint16 localPort)
-    : d(new QHttpServerRequestPrivate(remoteAddress, remotePort, localAddress, localPort))
+                                       const QHostAddress &localAddress, quint16 localPort,const QHttpServer * s)
+    : d(new QHttpServerRequestPrivate(remoteAddress, remotePort, localAddress, localPort,s))
 {}
 
 #if QT_CONFIG(ssl)
@@ -630,10 +630,10 @@ QHttpServerRequest::QHttpServerRequest(const QHostAddress &remoteAddress, quint1
 */
 QHttpServerRequest::QHttpServerRequest(const QHostAddress &remoteAddress, quint16 remotePort,
                                        const QHostAddress &localAddress, quint16 localPort,
-                                       const QSslConfiguration &sslConfiguration)
+                                       const QSslConfiguration &sslConfiguration,const QHttpServer * s)
     : d(new QHttpServerRequestPrivate(remoteAddress, remotePort,
                                       localAddress, localPort,
-                                      sslConfiguration))
+                                      sslConfiguration,s))
 {}
 #endif
 

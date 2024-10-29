@@ -23,14 +23,14 @@ QHttpServerRequest QHttpServerStream::initRequestFromSocket(QTcpSocket *tcpSocke
         if (auto *ssl = qobject_cast<const QSslSocket *>(tcpSocket)) {
             return QHttpServerRequest(ssl->peerAddress(), ssl->peerPort(),
                                       ssl->localAddress(), ssl->localPort(),
-                                      ssl->sslConfiguration());
+                                      ssl->sslConfiguration(),qobject_cast<QHttpServer * >(tcpSocket->parent()));
         }
 #endif
         return QHttpServerRequest(tcpSocket->peerAddress(), tcpSocket->peerPort(),
-                                  tcpSocket->localAddress(), tcpSocket->localPort());
+                                  tcpSocket->localAddress(), tcpSocket->localPort(),qobject_cast<QHttpServer * >(tcpSocket->parent()));
     }
 
-    return QHttpServerRequest(QHostAddress::LocalHost, 0, QHostAddress::LocalHost, 0);
+    return QHttpServerRequest(QHostAddress::LocalHost, 0, QHostAddress::LocalHost, 0,nullptr);
 }
 
 QT_END_NAMESPACE

@@ -27,11 +27,11 @@ class QHttpServerRequestPrivate
 {
 public:
     QHttpServerRequestPrivate(const QHostAddress &remoteAddress, quint16 remotePort,
-                              const QHostAddress &localAddress, quint16 localPort,std::shared_ptr<QHttpServer> s);
+                              const QHostAddress &localAddress, quint16 localPort,const QHttpServer * s);
 #if QT_CONFIG(ssl)
     QHttpServerRequestPrivate(const QHostAddress &remoteAddress, quint16 remotePort,
                               const QHostAddress &localAddress, quint16 localPort,
-                              const QSslConfiguration &sslConfiguration,std::shared_ptr<QHttpServer> s);
+                              const QSslConfiguration &sslConfiguration,const QHttpServer * s);
 #endif
 
     quint16 port = 0;
@@ -87,7 +87,7 @@ public:
     QByteArray fragment;
     QByteDataBuffer bodyBuffer;
     QByteArray body;
-    std::shared_ptr<const QHttpServer> server;
+    const QHttpServer * server;
 };
 
 QT_END_NAMESPACE
