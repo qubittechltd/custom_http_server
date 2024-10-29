@@ -46,8 +46,7 @@ private:
 
 public:
     QHttpServerRouterRule * middleware(std::string name);
-    template<typename M>
-    QHttpServerRouterRule * middleware();
+    template<typename M> QHttpServerRouterRule * middleware();
 #ifdef Q_QDOC
     template <typename Functor>
     QHttpServerRouterRule(
