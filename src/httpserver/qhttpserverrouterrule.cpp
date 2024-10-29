@@ -1,6 +1,7 @@
 // Copyright (C) 2019 The Qt Company Ltd.
 // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GPL-3.0-only
 
+#include "QtHttpServer/middleware_impl.h"
 #include <QtHttpServer/qhttpserverrouterrule.h>
 #include <QtHttpServer/qhttpserverresponder.h>
 
@@ -203,12 +204,7 @@ QHttpServerRouterRule::~QHttpServerRouterRule()
 {
 }
 
-QHttpServerRouterRule *QHttpServerRouterRule::middleware(std::string name){
-/*!
-    Returns the context object of this rule. This is the receiver that has to
-    handle the request.
-*/
-const QObject *QHttpServerRouterRule::contextObject() const
+QHttpServerRouterRule *QHttpServerRouterRule::middleware(std::string name)
 {
     Q_D(const QHttpServerRouterRule);
     auto type = QMetaType::fromName(name);
@@ -223,6 +219,16 @@ const QObject *QHttpServerRouterRule::contextObject() const
     }
     qWarning("Middleware (%s) is not valid ",name.c_str());
     return this;
+
+}
+
+/*!
+    Returns the context object of this rule. This is the receiver that has to
+    handle the request.
+*/
+const QObject *QHttpServerRouterRule::contextObject() const
+{
+    Q_D(const QHttpServerRouterRule);
     return d->context;
 }
 
