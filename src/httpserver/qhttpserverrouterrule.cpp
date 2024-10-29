@@ -184,7 +184,7 @@ QHttpServerRouterRule::QHttpServerRouterRule(const QString &pathPattern,
                                              const QObject *context,
                                              QtPrivate::QSlotObjectBase *slotObjRaw)
     : QHttpServerRouterRule(new QHttpServerRouterRulePrivate{
-              pathPattern, methods, QtPrivate::SlotObjUniquePtr(slotObjRaw), QPointer(context), {}})
+          pathPattern, methods, QtPrivate::SlotObjUniquePtr(slotObjRaw), QPointer(context), {}, {}})
 {
     Q_ASSERT(slotObjRaw);
 }
@@ -206,11 +206,11 @@ QHttpServerRouterRule::~QHttpServerRouterRule()
 
 QHttpServerRouterRule *QHttpServerRouterRule::middleware(std::string name)
 {
-    Q_D(const QHttpServerRouterRule);
+    Q_D(QHttpServerRouterRule);
     auto type = QMetaType::fromName(name);
 
     if(type.isValid() /*&& registeredInKernel.contains(type.id())*/){
-        if(auto m = dynamic_cast<QUBIT::MiddleWareIMpl *>(type.create())){
+        if(auto m = static_cast<QUBIT::MiddleWareIMpl *>(type.create())){
             d->middlewares.push_back(m);
             return this;
         }else{
