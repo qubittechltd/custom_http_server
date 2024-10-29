@@ -70,6 +70,8 @@ namespace QUBIT {
     };
 }
 
+QT_BEGIN_NAMESPACE
 
+QT_END_NAMESPACE
 
 #endif // MIDDLEWARE_IMPL_H
