@@ -10,7 +10,6 @@ QT_END_NAMESPACE
 
 
 namespace QUBIT {
-    class Session;
     struct MiddleWareIMpl
     {
         using  MiddleWares = std::vector<const MiddleWareIMpl *>;
@@ -65,8 +64,8 @@ namespace QUBIT {
             return this;
         }
 
-        using ControllerHandler = std::function<QHttpServerResponse(const QHttpServerRequest &, Session &)>;
-        using ControllerHandlerRegex = std::function<QHttpServerResponse(const QRegularExpressionMatch &,const QHttpServerRequest &, Session &)>;
+        using ControllerHandler = std::function<QHttpServerResponse(const QHttpServerRequest &)>;
+        using ControllerHandlerRegex = std::function<QHttpServerResponse(const QRegularExpressionMatch &,const QHttpServerRequest &)>;
 
         MiddleWareIMpl * only(const std::variant<ControllerHandler,ControllerHandlerRegex> & handler){
             Q_UNUSED(handler)
