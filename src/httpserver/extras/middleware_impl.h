@@ -56,6 +56,9 @@ namespace QUBIT {
         virtual std::unique_ptr<QHttpServerResponse> handle(const QHttpServerRequest &request, const Next &next) const {
             return next(request);
         };
+
+        // virtual std::string name () const = 0;
+
     public:
         MiddleWareIMpl * only(const std::string & method_name){
             qWarning("TODO MiddleWareIMpl * only(std::string method_name = %s) not implemented",method_name.c_str());
