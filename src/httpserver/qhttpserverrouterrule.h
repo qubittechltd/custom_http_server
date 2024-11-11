@@ -45,8 +45,6 @@ private:
                           const QObject *context, QtPrivate::QSlotObjectBase *slotObjRaw);
 
 public:
-    QHttpServerRouterRule * middleware(std::string name);
-    template<typename M> QHttpServerRouterRule * middleware();
 #ifdef Q_QDOC
     template <typename Functor>
     QHttpServerRouterRule(

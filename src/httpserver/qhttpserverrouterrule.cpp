@@ -1,7 +1,7 @@
 // Copyright (C) 2019 The Qt Company Ltd.
 // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GPL-3.0-only
 
-#include "QtHttpServer/middleware_impl.h"
+// #include "QtHttpServer/middleware_impl.h"
 #include <QtHttpServer/qhttpserverrouterrule.h>
 #include <QtHttpServer/qhttpserverresponder.h>
 
@@ -184,7 +184,7 @@ QHttpServerRouterRule::QHttpServerRouterRule(const QString &pathPattern,
                                              const QObject *context,
                                              QtPrivate::QSlotObjectBase *slotObjRaw)
     : QHttpServerRouterRule(new QHttpServerRouterRulePrivate{
-          pathPattern, methods, QtPrivate::SlotObjUniquePtr(slotObjRaw), QPointer(context), {}, {}})
+          pathPattern, methods, QtPrivate::SlotObjUniquePtr(slotObjRaw), QPointer(context), {}})
 {
     Q_ASSERT(slotObjRaw);
 }
@@ -202,22 +202,6 @@ QHttpServerRouterRule::QHttpServerRouterRule(QHttpServerRouterRulePrivate *d)
 */
 QHttpServerRouterRule::~QHttpServerRouterRule()
 {
-}
-
-QHttpServerRouterRule *QHttpServerRouterRule::middleware(std::string name)
-{
-    auto type = QMetaType::fromName(name);
-    if(type.isValid() /*&& registeredInKernel.contains(type.id())*/){
-        if(auto m = static_cast<QUBIT::MiddleWareIMpl *>(type.create())){
-            d_ptr->middlewares.push_back(m);
-            return this;
-        }else{
-            qWarning("Middleware (%s) is not registered ",name.c_str());
-        }
-    }
-    qWarning("Middleware (%s) is not valid ",name.c_str());
-    return this;
-
 }
 
 /*!
@@ -344,15 +328,3 @@ bool QHttpServerRouterRule::createPathRegexp(std::initializer_list<QMetaType> me
 }
 
 QT_END_NAMESPACE
-
-template<typename M>
-QHttpServerRouterRule *QHttpServerRouterRule::middleware(){
-    Q_D( QHttpServerRouterRule);
-    for(auto m : d->middlewares){
-        if(auto _m = dynamic_cast<M*>(m)){
-            return this;
-        }
-    }
-    d->middlewares.push_back(new M);
-    return this;
-}

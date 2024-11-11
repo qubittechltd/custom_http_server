@@ -20,10 +20,6 @@
 //
 // We mean it.
 
-namespace QUBIT{
-struct MiddleWareIMpl;
-}
-
 QT_BEGIN_NAMESPACE
 
 class QHttpServerRouterRulePrivate
@@ -35,7 +31,6 @@ public:
     QPointer<const QObject> context;
 
     QRegularExpression pathRegexp;
-    std::vector<const QUBIT::MiddleWareIMpl * > middlewares;
 };
 
 QT_END_NAMESPACE
