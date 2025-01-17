@@ -23,6 +23,9 @@ class QString;
 class QHttpHeaders;
 class QHttpServer;
 namespace QUBIT {
+namespace Illuminate {
+namespace Support {
+
     class Session;
     template<typename Session>
     class SessionImpl{
@@ -32,7 +35,8 @@ namespace QUBIT {
         }
     };
 }
-
+}
+}
 class QHttpServerRequestPrivate;
 class QHttpServerRequest final
 {
@@ -76,7 +80,7 @@ public:
     Q_HTTPSERVER_EXPORT quint16 remotePort() const;
     Q_HTTPSERVER_EXPORT QHostAddress localAddress() const;
     Q_HTTPSERVER_EXPORT quint16 localPort() const;
-    Q_HTTPSERVER_EXPORT QUBIT::Session &session() const;
+    Q_HTTPSERVER_EXPORT QUBIT::Illuminate::Support::Session &session() const;
     Q_HTTPSERVER_EXPORT QHttpServer *server() const;
 #if QT_CONFIG(ssl)
     Q_HTTPSERVER_EXPORT QSslConfiguration sslConfiguration() const;
