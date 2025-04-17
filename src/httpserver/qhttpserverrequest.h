@@ -29,10 +29,7 @@ namespace Support {
     class Session;
     template<typename Session>
     class SessionImpl{
-        Session & session() const {
-            static_assert(0," Please inhereint this");
-            return Session();
-        }
+        virtual Session & session() const {}
     };
 }
 }
