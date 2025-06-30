@@ -3,7 +3,7 @@
 
 # Generated from qthttpserver.pro.
 
-cmake_minimum_required(VERSION 3.16)
+cmake_minimum_required(VERSION 3.29)
 
 include(.cmake.conf)
 project(CustomHttpServer
