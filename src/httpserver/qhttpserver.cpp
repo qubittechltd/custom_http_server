@@ -63,7 +63,7 @@ void QHttpServerPrivate::callMissingHandler(const QHttpServerRequest &request,
     });
 
     auto tcpserver = new QTcpServer();
-    if (!tcpserver->listen() || !server.bind(tcpserver.get())) {
+    if (!tcpserver->listen() || !server.bind(tcpserver)) {
         delete tcpserver;
         return -1;
     }
@@ -126,7 +126,7 @@ QHttpServer::QHttpServer(QObject *parent)
     \code
     server.route("/test3", this, [] (const QHttpServerRequest &request,
                                     QHttpServerResponder &responder) {
-                                    responder.write(req.body(), "text/plain"_ba);});
+                                    responder.write(request.body(), "text/plain"_ba);});
     \endcode
 
     Finally, the callback can contain an arbitrary amount of copiable
@@ -274,8 +274,8 @@ void QHttpServer::clearMissingHandler()
     Register a \a receiver and \a slot to be called after every request is
     handled.
 
-    The \a slot has to implement the signature \c{void (*)(QHttpServerResponse&,
-    const QHttpServerRequest&)}.
+    The \a slot has to implement the signature \c{void (*)(const QHttpServerRequest &,
+    QHttpServerResponse &)}.
 
     The \a slot can also be a function pointer, non-mutable lambda, or any other
     copiable callable with const call operator. In that case the \a receiver will
@@ -286,7 +286,7 @@ void QHttpServer::clearMissingHandler()
 
     \code
     QHttpServer server;
-    server.addAfterRequestHandler(&server, [] (QHttpServerResponse &resp, const QHttpServerRequest &req) {
+    server.addAfterRequestHandler(&server, [] (const QHttpServerRequest &req, QHttpServerResponse &resp) {
         resp.write(req.body(), "text/plain"_ba);
     }
     \endcode

@@ -28,6 +28,8 @@
 #include <QtNetwork/qsslkey.h>
 #include <QtNetwork/qsslserver.h>
 
+#include <QtTest/private/qtesthelpers_p.h>
+
 constexpr char g_privateKey[] = R"(-----BEGIN RSA PRIVATE KEY-----
 MIIJKAIBAAKCAgEAvdrtZtVquwiG12+vd3OjRVibdK2Ob73DOOWgb5rIgQ+B2Uzc
 OFa0xsiRyc/bam9CEEqgn5YHSn95LJHvN3dbsA8vrFqIXTkisFAuHJqsmsYZbAIi
@@ -131,7 +133,9 @@ enum ServerType
 };
 
 static int port = 0;
+#if QT_CONFIG(ssl)
 static int sslPort = 0;
+#endif
 static QString local = u"tst_qhttpservermultithreaded_local"_s;
 // Simple HTTP 1.1 client
 class LocalHttpClient
@@ -427,8 +431,10 @@ void tst_QHttpServerMultithreaded::initTestCase_data()
     QTest::addColumn<ServerType>("serverType");
     QTest::addRow("TCP") << ServerType::TCP;
 #if QT_CONFIG(ssl)
-    if (QSslSocket::supportsSsl())
+    if (QSslSocket::supportsSsl() && !QTestPrivate::isSecureTransportBlockingTest())
         QTest::addRow("SSL") << ServerType::SSL;
+    else if (QSslSocket::supportsSsl())
+        qInfo("Not testing TLS, keychain access will block the test");
 #endif
 #if QT_CONFIG(localserver)
     QTest::addRow("LOCAL") << ServerType::LOCAL;

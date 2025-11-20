@@ -1,7 +1,6 @@
 // Copyright (C) 2019 The Qt Company Ltd.
 // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GPL-3.0-only
 
-// #include "QtHttpServer/middleware_impl.h"
 #include <QtHttpServer/qhttpserverrouterrule.h>
 #include <QtHttpServer/qhttpserverresponder.h>
 
@@ -184,7 +183,7 @@ QHttpServerRouterRule::QHttpServerRouterRule(const QString &pathPattern,
                                              const QObject *context,
                                              QtPrivate::QSlotObjectBase *slotObjRaw)
     : QHttpServerRouterRule(new QHttpServerRouterRulePrivate{
-          pathPattern, methods, QtPrivate::SlotObjUniquePtr(slotObjRaw), QPointer(context), {}})
+              pathPattern, methods, QtPrivate::SlotObjUniquePtr(slotObjRaw), QPointer(context), {}})
 {
     Q_ASSERT(slotObjRaw);
 }
@@ -213,8 +212,6 @@ const QObject *QHttpServerRouterRule::contextObject() const
     Q_D(const QHttpServerRouterRule);
     return d->context;
 }
-
-
 
 /*!
     Returns \c true if the methods is valid

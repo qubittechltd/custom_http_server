@@ -28,6 +28,7 @@
 
 #if QT_CONFIG(ssl)
 #include <QtNetwork/qsslconfiguration.h>
+#include <QtNetwork/qsslsocket.h>
 #include <QtNetwork/qsslkey.h>
 #include <QtNetwork/qsslserver.h>
 #endif
@@ -38,7 +39,11 @@
 #include <QtNetwork/qlocalsocket.h>
 #endif
 
+#include <QtTest/private/qtesthelpers_p.h>
+
 #include <array>
+
+QT_BEGIN_NAMESPACE
 
 #if QT_CONFIG(ssl)
 
@@ -130,8 +135,6 @@ NQZlAZc2w1Ha9lqisaWWpt42QVhQM64=
 
 #endif // QT_CONFIG(ssl)
 
-QT_BEGIN_NAMESPACE
-
 using namespace Qt::StringLiterals;
 
 using RouterHandler = std::function<void(const QRegularExpressionMatch &,
@@ -210,6 +213,7 @@ class tst_QHttpServer final : public QObject
 private slots:
     void initTestCase_data();
     void initTestCase();
+    void init();
     void routeGet_data();
     void routeGet();
     void routeKeepAlive();
@@ -531,6 +535,15 @@ void tst_QHttpServer::initTestCase()
                 });
     }
 #endif
+}
+
+void tst_QHttpServer::init()
+{
+#if QT_CONFIG(ssl)
+    QFETCH_GLOBAL(const bool, useSsl);
+    if (useSsl && QTestPrivate::isSecureTransportBlockingTest())
+        QSKIP("SslServer is blocking the test execution while trying to access the login keychain");
+#endif // QT_CONFIG(ssl)
 }
 
 void tst_QHttpServer::routeGet_data()

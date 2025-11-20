@@ -9,7 +9,7 @@
 #    `$qt_prefix/bin/qt-cmake ..` or `cmake -DCMAKE_PREFIX_PATH=/path/to/qt ..`
 # 4) ctest         # Run ctest
 
-cmake_minimum_required(VERSION 3.29)
+cmake_minimum_required(VERSION 3.16)
 project(httpserver_cmake_tests)
 enable_testing()
 
